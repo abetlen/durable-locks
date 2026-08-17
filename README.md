@@ -3,7 +3,7 @@
 <p align="center"><strong>Time-leased distributed locks with signed fencing tokens, built on Durable Objects and celld.</strong></p>
 
 <p align="center">
-  <a href="https://github.com/abetlen/distributed-locking-api/actions/workflows/checks.yml"><img alt="Checks" src="https://github.com/abetlen/distributed-locking-api/actions/workflows/checks.yml/badge.svg"></a>
+  <a href="https://github.com/abetlen/durable-locks/actions/workflows/checks.yml"><img alt="Checks" src="https://github.com/abetlen/durable-locks/actions/workflows/checks.yml/badge.svg"></a>
   <a href="./LICENSE.md"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <a href="https://www.typescriptlang.org/"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white"></a>
 </p>
