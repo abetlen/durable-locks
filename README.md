@@ -118,18 +118,6 @@ The lease advances the epoch and includes a signed fencing token:
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    Client[Client] --> API[Hono API]
-    API --> Namespace[LockNamespace Durable Object]
-    API --> Lock[Lock Durable Object]
-    Namespace -- init RPC --> Lock
-    Namespace --> NamespaceDB[(Namespace SQLite)]
-    Lock --> LockDB[(Lock SQLite)]
-    NamespaceDB -- LTX --> RustFS[(RustFS / S3)]
-    LockDB -- LTX --> RustFS
-```
-
 Each namespace has one `LockNamespace` Durable Object that maps idempotent names to generated `lck-…` identifiers and supports listing and metadata filtering.
 Each generated identifier addresses an independent `Lock` Durable Object containing the immutable lock configuration, current fencing epoch, active lease, and signing key.
 Both Durable Object classes initialize their SQLite schemas inside `blockConcurrencyWhile()` before serving requests.
