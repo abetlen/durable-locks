@@ -1,0 +1,26 @@
+{
+  "name": "distributed-locking-api",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --format=esm --platform=browser --target=es2022 --external:cloudflare:workers --outfile=src/dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "start": "./local.sh start",
+    "test:local": "./local.sh test",
+    "status": "./local.sh status",
+    "logs": "./local.sh logs",
+    "stop": "./local.sh stop",
+    "reset": "./local.sh reset"
+  },
+  "dependencies": {
+    "@hono/swagger-ui": "^0.6.1",
+    "@hono/zod-openapi": "^1.6.0",
+    "hono": "^4.13.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260816.1",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}

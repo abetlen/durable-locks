@@ -1,0 +1,30 @@
+{
+  "name": "distributed-locking-api",
+  "main": "dist/index.js",
+  "compatibility_date": "2026-01-01",
+  "no_bundle": true,
+  "vars": {
+    "DEFAULT_LOCK_NAMESPACE": "default"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "LOCK",
+        "class_name": "Lock"
+      },
+      {
+        "name": "LOCK_NAMESPACE",
+        "class_name": "LockNamespace"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "Lock",
+        "LockNamespace"
+      ]
+    }
+  ]
+}
