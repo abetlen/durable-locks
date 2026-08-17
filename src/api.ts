@@ -554,27 +554,27 @@ const releaseLockRoute = createRoute({
   },
 });
 
+const resolveNamespace = (
+  requestedNamespace: string | undefined,
+  env: Bindings,
+): string => {
+  const namespace =
+    requestedNamespace ??
+    env.DEFAULT_LOCK_NAMESPACE ??
+    DEFAULT_LOCK_NAMESPACE;
+  const parsed = LockNamespaceNameSchema.safeParse(namespace);
+  if (!parsed.success) {
+    throw new Error("DEFAULT_LOCK_NAMESPACE is invalid");
+  }
+  return parsed.data;
+};
+
+const getNamespace = (env: Bindings, namespace: string) =>
+  env.LOCK_NAMESPACE.getByName(namespace);
+
 export const registerApi = (
   app: OpenAPIHono<AppEnvironment>,
 ): void => {
-  const resolveNamespace = (
-    requestedNamespace: string | undefined,
-    env: Bindings,
-  ): string => {
-    const namespace =
-      requestedNamespace ??
-      env.DEFAULT_LOCK_NAMESPACE ??
-      DEFAULT_LOCK_NAMESPACE;
-    const parsed = LockNamespaceNameSchema.safeParse(namespace);
-    if (!parsed.success) {
-      throw new Error("DEFAULT_LOCK_NAMESPACE is invalid");
-    }
-    return parsed.data;
-  };
-
-  const getNamespace = (env: Bindings, namespace: string) =>
-    env.LOCK_NAMESPACE.getByName(namespace);
-
   app.openapi(getLockJwksRoute, async (context) => {
     const { id } = context.req.valid("param");
     const jwks = await context.env.LOCK.getByName(id).jwks(id);

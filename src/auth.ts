@@ -113,8 +113,9 @@ const oidcConfig = (env: Bindings): OidcConfig | null => {
   ) {
     throw new Error("OIDC configuration is incomplete");
   }
+  let normalizedJwksUrl: string;
   try {
-    new URL(jwksUrl as string);
+    normalizedJwksUrl = new URL(jwksUrl as string).toString();
   } catch {
     throw new Error("OIDC_JWKS_URL is invalid");
   }
@@ -137,7 +138,7 @@ const oidcConfig = (env: Bindings): OidcConfig | null => {
   return {
     issuer: issuer as string,
     audience: audience as string,
-    jwksUrl: jwksUrl as string,
+    jwksUrl: normalizedJwksUrl,
     accessClaim: (grantsClaim ?? namespaceClaim) as string,
     accessClaimMode: grantsClaim === undefined ? "namespaces" : "grants",
     algorithms,

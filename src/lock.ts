@@ -176,6 +176,7 @@ export type LockPage = {
 const serializeMetadata = (metadata: LockMetadata): string =>
   JSON.stringify(
     Object.fromEntries(
+      // oxlint-disable-next-line unicorn/no-array-sort -- Object.entries returns a fresh array.
       Object.entries(metadata).sort(([left], [right]) =>
         left < right ? -1 : left > right ? 1 : 0,
       ),

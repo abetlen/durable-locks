@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --format=esm --platform=browser --target=es2022 --external:cloudflare:workers --outfile=src/dist/index.js",
+    "lint": "oxlint src --deny-warnings -D correctness -D suspicious",
     "typecheck": "tsc --noEmit",
     "start": "./local.sh start",
     "test:local": "./local.sh test",
@@ -21,6 +22,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260816.1",
     "esbuild": "^0.28.2",
+    "oxlint": "^1.78.0",
     "typescript": "^7.0.2"
   }
 }
