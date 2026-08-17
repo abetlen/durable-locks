@@ -8,8 +8,9 @@
   <a href="https://www.typescriptlang.org/"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white"></a>
 </p>
 
-Durable Locks is a TypeScript reference implementation of lease-based distributed locks with monotonically increasing fencing epochs.
-It runs on [celld](https://github.com/denoland/celld), persists Durable Object state to a local [RustFS](https://github.com/rustfs/rustfs) S3-compatible bucket, and exposes a [Hono](https://hono.dev) REST API with generated OpenAPI documentation.
+A TypeScript reference implementation of lease-based distributed locks built on top of durable objects.
+It runs workers locally using [celld](https://github.com/denoland/celld) and persists Durable Object state to [RustFS](https://github.com/rustfs/rustfs) S3-compatible bucket.
+Each worker exposes a [Hono](https://hono.dev) REST API with generated OpenAPI documentation.
 
 > [!IMPORTANT]
 > This repository is designed for local exploration and as a foundation for further development.
@@ -20,18 +21,15 @@ It runs on [celld](https://github.com/denoland/celld), persists Durable Object s
 - One independent SQLite-backed Durable Object per lock.
 - Atomic, monotonically increasing fencing epochs.
 - ES256-signed JWT fencing tokens with a per-lock JWKS endpoint.
-- Idempotent lock creation and named lease acquisition.
-- Early lease release and request-driven expiration without alarms.
-- Namespaced lock discovery, immutable metadata, filtering, and cursor pagination.
-- Optional deployment-wide OIDC authentication with action scopes and resource grants.
+- OIDC authentication with action scopes and resource grants.
 
 ## Quick start
 
 ### Requirements
 
-- Docker with a running daemon.
-- Node.js 24 with npm.
-- curl.
+- Docker to run celld and RustFS
+- Node.js 24 with npm
+- curl
 
 ### Start the environment
 
