@@ -1,6 +1,6 @@
 <h1 align="center">Durable Locks</h1>
 
-<p align="center"><strong>Time-leased distributed locks with signed fencing tokens, built on Durable Objects and celld.</strong></p>
+<p align="center"><strong>Distributed locking using durable objects.</strong></p>
 
 <p align="center">
   <a href="https://github.com/abetlen/durable-locks/actions/workflows/checks.yml"><img alt="Checks" src="https://github.com/abetlen/durable-locks/actions/workflows/checks.yml/badge.svg"></a>
