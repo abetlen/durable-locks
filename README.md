@@ -8,7 +8,7 @@
   <a href="https://www.typescriptlang.org/"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white"></a>
 </p>
 
-A TypeScript reference implementation of lease-based distributed locks built on top of durable objects.
+A TypeScript reference implementation of [fencing-based distributed locks](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html) built on top of durable objects.
 It runs workers locally using [celld](https://github.com/denoland/celld) and persists Durable Object state to [RustFS](https://github.com/rustfs/rustfs) S3-compatible bucket.
 Each worker exposes a [Hono](https://hono.dev) REST API with generated OpenAPI documentation.
 
