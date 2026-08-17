@@ -351,7 +351,7 @@ export class Lock extends DurableObject<Bindings> {
       kid: key.kid,
     };
     const claims = {
-      iss: "distributed-locking-api",
+      iss: "durable-locks",
       sub: config.id,
       jti: lease.lease_id,
       iat: Math.floor(lease.acquired_at_ms / 1000),

@@ -30,7 +30,7 @@ app.openAPIRegistry.registerComponent("securitySchemes", "oidcBearer", {
 app.doc("/openapi.json", {
   openapi: "3.0.0",
   info: {
-    title: "Distributed Locking API",
+    title: "Durable Locks",
     version: "1.0.0",
   },
   tags: [

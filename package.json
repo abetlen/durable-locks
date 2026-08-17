@@ -1,5 +1,5 @@
 {
-  "name": "distributed-locking-api",
+  "name": "durable-locks",
   "private": true,
   "license": "MIT",
   "scripts": {

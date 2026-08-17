@@ -1,4 +1,4 @@
-<h1 align="center">Distributed Locking API</h1>
+<h1 align="center">Durable Locks</h1>
 
 <p align="center"><strong>Time-leased distributed locks with signed fencing tokens, built on Durable Objects and celld.</strong></p>
 
@@ -8,14 +8,14 @@
   <a href="https://www.typescriptlang.org/"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white"></a>
 </p>
 
-Distributed Locking API is a TypeScript reference implementation of lease-based distributed locks with monotonically increasing fencing epochs.
+Durable Locks is a TypeScript reference implementation of lease-based distributed locks with monotonically increasing fencing epochs.
 It runs on [celld](https://github.com/denoland/celld), persists Durable Object state to a local [RustFS](https://github.com/rustfs/rustfs) S3-compatible bucket, and exposes a [Hono](https://hono.dev) REST API with generated OpenAPI documentation.
 
 > [!IMPORTANT]
 > This repository is designed for local exploration and as a foundation for further development.
 > The included environment uses fixed development credentials and is not a production deployment.
 
-## Highlights
+## Overview
 
 - One independent SQLite-backed Durable Object per lock.
 - Atomic, monotonically increasing fencing epochs.
@@ -24,7 +24,6 @@ It runs on [celld](https://github.com/denoland/celld), persists Durable Object s
 - Early lease release and request-driven expiration without alarms.
 - Namespaced lock discovery, immutable metadata, filtering, and cursor pagination.
 - Optional deployment-wide OIDC authentication with action scopes and resource grants.
-- A complete local environment driven by one readable shell script and plain Docker commands.
 
 ## Quick start
 
@@ -33,8 +32,6 @@ It runs on [celld](https://github.com/denoland/celld), persists Durable Object s
 - Docker with a running daemon.
 - Node.js 24 with npm.
 - curl.
-
-Docker Compose, a local Rust toolchain, and AWS tooling are not required.
 
 ### Start the environment
 
@@ -52,7 +49,7 @@ The local services are then available at:
 - RustFS S3 API: <http://127.0.0.1:9000>
 - RustFS console: <http://127.0.0.1:9001>
 
-The RustFS console credentials are `distributed-locking-api` and `distributed-locking-api-secret`.
+The RustFS console credentials are `durable-locks` and `durable-locks-secret`.
 
 ## Try the API
 
@@ -180,12 +177,6 @@ The generated OpenAPI document and interactive Swagger UI are the canonical requ
 - `POST /api/v1/locks/:id/release` idempotently releases a matching lease identifier.
 - `GET /api/v1/locks/:id/jwks` returns the immutable public key used to verify fencing tokens.
 
-### Service
-
-- `GET /openapi.json` returns the generated OpenAPI 3.0 document.
-- `GET /docs` serves Swagger UI.
-- `GET /health` returns the readiness status used by the local environment.
-
 ## Namespaces, metadata, and pagination
 
 Requests may select a namespace explicitly or omit it to use `DEFAULT_LOCK_NAMESPACE`, which itself falls back to `default`.
@@ -214,7 +205,7 @@ Add the following variables to `vars` in `src/wrangler.jsonc`:
   "OIDC_ISSUER": "https://identity.example.com/",
   "OIDC_AUDIENCE": "https://locks.example.com",
   "OIDC_JWKS_URL": "https://identity.example.com/.well-known/jwks.json",
-  "OIDC_NAMESPACE_CLAIM": "https://locks.example.com/namespaces",
+  "OIDC_GRANTS_CLAIM": "https://locks.example.com/grants",
   "OIDC_ALGORITHMS": "RS256"
 }
 ```
@@ -233,19 +224,9 @@ The API accepts `scope` as a space-separated string and `scp` as either a string
 
 Scopes are independent, so `locks:admin` does not imply `locks:read` or `locks:write`.
 
-### Namespace grants
-
-Set `OIDC_NAMESPACE_CLAIM` when the provider emits an array or space-separated string of namespace names:
-
-```json
-{
-  "https://locks.example.com/namespaces": ["team-a", "staging"]
-}
-```
-
 ### Metadata grants
 
-Set `OIDC_GRANTS_CLAIM` instead of `OIDC_NAMESPACE_CLAIM` to authorize namespace-bound metadata selectors:
+Set `OIDC_GRANTS_CLAIM` to the claim containing namespace-bound metadata selectors:
 
 ```json
 {
@@ -267,7 +248,6 @@ Set `OIDC_GRANTS_CLAIM` instead of `OIDC_NAMESPACE_CLAIM` to authorize namespace
 }
 ```
 
-Exactly one of `OIDC_NAMESPACE_CLAIM` or `OIDC_GRANTS_CLAIM` must be configured.
 Multiple grants use OR semantics, while metadata pairs within one grant use AND semantics.
 Every metadata key is treated uniformly, and there are no reserved authorization metadata keys.
 Omitting `metadata` or using an empty object grants access to every lock in that grant's namespace.
@@ -331,24 +311,6 @@ RUSTFS_CONSOLE_PORT=9101 \
 The local environment does not migrate Durable Object storage created by incompatible source revisions.
 Run `./local.sh reset` after an incompatible schema change.
 
-## Project layout
-
-```text
-.
-├── .github/workflows/checks.yml  # Lint and type-check CI
-├── scripts/test-api.sh           # End-to-end API checks
-├── src/
-│   ├── api.ts                    # Hono routes and OpenAPI schemas
-│   ├── auth.ts                   # OIDC verification and authorization
-│   ├── bindings.ts               # Worker bindings
-│   ├── index.ts                  # Worker entrypoint
-│   ├── lock.ts                   # Lock and LockNamespace Durable Objects
-│   ├── utils.ts                  # Shared schemas and helpers
-│   └── wrangler.jsonc            # Worker and Durable Object configuration
-├── local.sh                      # Local RustFS and celld lifecycle
-└── package.json                  # JavaScript tooling and commands
-```
-
 ## Contributing
 
 Issues and pull requests are welcome.
@@ -356,4 +318,4 @@ Run linting, type-checking, and the local integration suite before submitting a 
 
 ## License
 
-Distributed Locking API is available under the [MIT License](./LICENSE.md).
+Durable Locks is available under the [MIT License](./LICENSE.md).

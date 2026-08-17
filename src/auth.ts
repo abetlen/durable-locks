@@ -27,8 +27,7 @@ type OidcConfig = {
   issuer: string;
   audience: string;
   jwksUrl: string;
-  accessClaim: string;
-  accessClaimMode: "grants" | "namespaces";
+  grantsClaim: string;
   algorithms: OidcAlgorithm[];
 };
 
@@ -92,14 +91,12 @@ const oidcConfig = (env: Bindings): OidcConfig | null => {
   const audience = configuredValue(env.OIDC_AUDIENCE);
   const jwksUrl = configuredValue(env.OIDC_JWKS_URL);
   const grantsClaim = configuredValue(env.OIDC_GRANTS_CLAIM);
-  const namespaceClaim = configuredValue(env.OIDC_NAMESPACE_CLAIM);
   const configuredAlgorithms = configuredValue(env.OIDC_ALGORITHMS);
   const configuredValues = [
     issuer,
     audience,
     jwksUrl,
     grantsClaim,
-    namespaceClaim,
     configuredAlgorithms,
   ];
   if (configuredValues.every((value) => value === undefined)) {
@@ -109,7 +106,7 @@ const oidcConfig = (env: Bindings): OidcConfig | null => {
     issuer === undefined ||
     audience === undefined ||
     jwksUrl === undefined ||
-    (grantsClaim === undefined) === (namespaceClaim === undefined)
+    grantsClaim === undefined
   ) {
     throw new Error("OIDC configuration is incomplete");
   }
@@ -139,8 +136,7 @@ const oidcConfig = (env: Bindings): OidcConfig | null => {
     issuer: issuer as string,
     audience: audience as string,
     jwksUrl: normalizedJwksUrl,
-    accessClaim: (grantsClaim ?? namespaceClaim) as string,
-    accessClaimMode: grantsClaim === undefined ? "namespaces" : "grants",
+    grantsClaim: grantsClaim as string,
     algorithms,
   };
 };
@@ -343,22 +339,10 @@ const grantsFromClaim = (value: unknown): LockAccessGrant[] => {
   return parsed.success ? parsed.data : [];
 };
 
-const namespaceGrantsFromClaim = (value: unknown): LockAccessGrant[] =>
-  stringValues(value)
-    .filter(
-      (namespace) =>
-        namespace === "*" ||
-        LockNamespaceNameSchema.safeParse(namespace).success,
-    )
-    .map((namespace) => ({ namespace, metadata: {} }));
-
 const accessGrantsFromClaims = (
   claims: Record<string, unknown>,
   config: OidcConfig,
-): LockAccessGrant[] =>
-  config.accessClaimMode === "grants"
-    ? grantsFromClaim(claims[config.accessClaim])
-    : namespaceGrantsFromClaim(claims[config.accessClaim]);
+): LockAccessGrant[] => grantsFromClaim(claims[config.grantsClaim]);
 
 export const authenticate = async (
   env: Bindings,

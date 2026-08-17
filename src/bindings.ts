@@ -7,7 +7,6 @@ export type Bindings = {
   OIDC_GRANTS_CLAIM?: string;
   OIDC_ISSUER?: string;
   OIDC_JWKS_URL?: string;
-  OIDC_NAMESPACE_CLAIM?: string;
   LOCK: DurableObjectNamespace<Lock>;
   LOCK_NAMESPACE: DurableObjectNamespace<LockNamespace>;
 };
