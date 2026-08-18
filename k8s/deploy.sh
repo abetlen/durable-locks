@@ -44,7 +44,7 @@ rustfs_endpoint() {
   local service_ip
   service_ip="$(
     kubectl --context "$KUBE_CONTEXT" --namespace "$NAMESPACE" \
-      get service rustfs --output jsonpath='{.spec.clusterIP}'
+      get service s3 --output jsonpath='{.spec.clusterIP}'
   )"
   if [ -z "$service_ip" ] || [ "$service_ip" = "None" ]; then
     die "RustFS has no ClusterIP."
@@ -56,7 +56,7 @@ wait_for_rustfs_route() {
   local endpoint="$1"
   local attempts=30
   while ((attempts > 0)); do
-    if curl --fail --silent --output /dev/null "$endpoint/health"; then
+    if curl --connect-timeout 1 --max-time 2 --fail --silent --output /dev/null "$endpoint/health"; then
       return
     fi
     sleep 1
@@ -124,7 +124,7 @@ main() {
   restart_celld
 
   say "Durable Locks is ready"
-  printf 'Port forward: kubectl --context %s --namespace %s port-forward service/celld 8080:8080\n' "$KUBE_CONTEXT" "$NAMESPACE"
+  printf 'Port forward: kubectl --context %s --namespace %s port-forward service/api 8080:80\n' "$KUBE_CONTEXT" "$NAMESPACE"
 }
 
 main "$@"
