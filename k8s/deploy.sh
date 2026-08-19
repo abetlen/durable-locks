@@ -4,18 +4,19 @@ set -Eeuo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 KUBE_CONTEXT="${KUBE_CONTEXT:-kind-kind}"
+NAMESPACE="durable-locks"
 STORAGE_BACKEND="${1:-rustfs}"
 
 case "$STORAGE_BACKEND" in
   rustfs)
-    NAMESPACE="durable-locks"
     OVERLAY="$ROOT_DIR/k8s/overlays/kind"
     STORAGE_DEPLOYMENT="rustfs"
+    S3_SERVICE="s3-rustfs"
     ;;
   seaweedfs)
-    NAMESPACE="durable-locks-seaweedfs"
     OVERLAY="$ROOT_DIR/k8s/overlays/kind-seaweedfs"
     STORAGE_DEPLOYMENT="seaweedfs"
+    S3_SERVICE="s3-seaweedfs"
     ;;
   *)
     printf 'error: storage backend must be rustfs or seaweedfs.\n' >&2
@@ -65,7 +66,7 @@ s3_endpoint() {
   local service_ip
   service_ip="$(
     kubectl --context "$KUBE_CONTEXT" --namespace "$NAMESPACE" \
-      get service s3 --output jsonpath='{.spec.clusterIP}'
+      get service "$S3_SERVICE" --output jsonpath='{.spec.clusterIP}'
   )"
   if [ -z "$service_ip" ] || [ "$service_ip" = "None" ]; then
     die "The S3 service has no ClusterIP."

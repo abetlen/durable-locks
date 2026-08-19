@@ -56,7 +56,7 @@ spec:
             - name: CELLD_BUCKET
               value: s3://durable-locks
             - name: S3_ENDPOINT
-              value: http://s3.durable-locks.svc.cluster.local:9000
+              value: http://s3-rustfs.durable-locks.svc.cluster.local:9000
             - name: CELLD_ADDR
               value: 0.0.0.0:8080
             - name: CELLD_INTERNAL_ADDR

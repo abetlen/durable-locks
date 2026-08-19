@@ -59,14 +59,14 @@ Deploy with RustFS:
 ./k8s/deploy.sh
 ```
 
-Deploy the independent SeaweedFS environment:
+Deploy with SeaweedFS:
 
 ```sh
 ./k8s/deploy.sh seaweedfs
 ```
 
-The RustFS environment uses the `durable-locks` namespace, while the SeaweedFS environment uses `durable-locks-seaweedfs` so both can run safely on the same cluster.
-Each command applies its Kustomize overlay, deploys the Worker to the selected object store, and restarts its celld node.
+Both overlays use the `durable-locks` namespace and expose their object stores through the distinct `s3-rustfs` and `s3-seaweedfs` Services.
+Each command applies its Kustomize overlay, points celld at the selected object store, deploys the Worker, and restarts the celld node.
 
 ## Try the API
 
