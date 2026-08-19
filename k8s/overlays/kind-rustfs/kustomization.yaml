@@ -2,7 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: durable-locks
 resources:
-  - ../../base
+  - ../../base/celld
+  - ../../base/rustfs
   - namespace.yaml
 secretGenerator:
   - name: s3-credentials
