@@ -9,7 +9,7 @@ STORAGE_BACKEND="${1:-rustfs}"
 
 case "$STORAGE_BACKEND" in
   rustfs)
-    OVERLAY="$ROOT_DIR/k8s/overlays/kind"
+    OVERLAY="$ROOT_DIR/k8s/overlays/kind-rustfs"
     STORAGE_DEPLOYMENT="rustfs"
     S3_SERVICE="s3-rustfs"
     ;;
