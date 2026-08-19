@@ -37,8 +37,6 @@ spec:
             - -dir=/data
             - -master.telemetry=false
             - -webdav=false
-            - -admin.user=durable-locks
-            - -admin.password=$(ADMIN_PASSWORD)
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -57,7 +55,12 @@ spec:
                 secretKeyRef:
                   name: s3-credentials
                   key: AWS_SECRET_ACCESS_KEY
-            - name: ADMIN_PASSWORD
+            - name: WEED_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: AWS_ACCESS_KEY_ID
+            - name: WEED_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: s3-credentials

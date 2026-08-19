@@ -34,8 +34,8 @@ S3_CLI_IMAGE="${S3_CLI_IMAGE:-rustfs/rc:v0.1.31}"
 
 BUCKET="durable-locks"
 AWS_REGION="us-east-1"
-ACCESS_KEY="durable-locks"
-SECRET_KEY="durable-locks-secret"
+ACCESS_KEY="admin"
+SECRET_KEY="admin"
 
 say() {
   printf '\n==> %s\n' "$*"

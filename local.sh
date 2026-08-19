@@ -16,8 +16,8 @@ CELLD_VOLUME="durable-locks-state"
 
 BUCKET="durable-locks"
 AWS_REGION="us-east-1"
-ACCESS_KEY="durable-locks"
-SECRET_KEY="durable-locks-secret"
+ACCESS_KEY="admin"
+SECRET_KEY="admin"
 
 CELLD_PORT="${CELLD_PORT:-8080}"
 RUSTFS_API_PORT="${RUSTFS_API_PORT:-9000}"

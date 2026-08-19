@@ -47,7 +47,7 @@ The local services are then available at:
 - RustFS S3 API: <http://127.0.0.1:9000>
 - RustFS console: <http://127.0.0.1:9001>
 
-The RustFS console credentials are `durable-locks` and `durable-locks-secret`.
+The storage console credentials are `admin` and `admin`.
 
 ### Kubernetes
 

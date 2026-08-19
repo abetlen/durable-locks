@@ -8,8 +8,8 @@ resources:
 secretGenerator:
   - name: s3-credentials
     literals:
-      - AWS_ACCESS_KEY_ID=durable-locks
-      - AWS_SECRET_ACCESS_KEY=durable-locks-secret
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=admin
     options:
       labels:
         app.kubernetes.io/name: rustfs
