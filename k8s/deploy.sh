@@ -4,11 +4,32 @@ set -Eeuo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 KUBE_CONTEXT="${KUBE_CONTEXT:-kind-kind}"
-NAMESPACE="durable-locks"
-OVERLAY="$ROOT_DIR/k8s/overlays/kind"
+STORAGE_BACKEND="${1:-rustfs}"
+
+case "$STORAGE_BACKEND" in
+  rustfs)
+    NAMESPACE="durable-locks"
+    OVERLAY="$ROOT_DIR/k8s/overlays/kind"
+    STORAGE_DEPLOYMENT="rustfs"
+    ;;
+  seaweedfs)
+    NAMESPACE="durable-locks-seaweedfs"
+    OVERLAY="$ROOT_DIR/k8s/overlays/kind-seaweedfs"
+    STORAGE_DEPLOYMENT="seaweedfs"
+    ;;
+  *)
+    printf 'error: storage backend must be rustfs or seaweedfs.\n' >&2
+    exit 1
+    ;;
+esac
+
+if (($# > 1)); then
+  printf 'error: usage: %s [rustfs|seaweedfs]\n' "$0" >&2
+  exit 1
+fi
 
 CELLD_IMAGE="${CELLD_IMAGE:-ghcr.io/denoland/celld:0.2.1}"
-RUSTFS_CLI_IMAGE="${RUSTFS_CLI_IMAGE:-rustfs/rc:v0.1.31}"
+S3_CLI_IMAGE="${S3_CLI_IMAGE:-rustfs/rc:v0.1.31}"
 
 BUCKET="durable-locks"
 AWS_REGION="us-east-1"
@@ -34,35 +55,35 @@ require_tools() {
 }
 
 apply_manifests() {
-  say "Applying the Kind overlay"
+  say "Applying the $STORAGE_BACKEND Kind overlay"
   kubectl --context "$KUBE_CONTEXT" apply --kustomize "$OVERLAY"
   kubectl --context "$KUBE_CONTEXT" --namespace "$NAMESPACE" \
-    rollout status deployment/rustfs --timeout=180s
+    rollout status "deployment/$STORAGE_DEPLOYMENT" --timeout=180s
 }
 
-rustfs_endpoint() {
+s3_endpoint() {
   local service_ip
   service_ip="$(
     kubectl --context "$KUBE_CONTEXT" --namespace "$NAMESPACE" \
       get service s3 --output jsonpath='{.spec.clusterIP}'
   )"
   if [ -z "$service_ip" ] || [ "$service_ip" = "None" ]; then
-    die "RustFS has no ClusterIP."
+    die "The S3 service has no ClusterIP."
   fi
   printf 'http://%s:9000' "$service_ip"
 }
 
-wait_for_rustfs_route() {
+wait_for_s3_route() {
   local endpoint="$1"
   local attempts=30
   while ((attempts > 0)); do
-    if curl --connect-timeout 1 --max-time 2 --fail --silent --output /dev/null "$endpoint/health"; then
+    if curl --connect-timeout 1 --max-time 2 --silent --output /dev/null "$endpoint/"; then
       return
     fi
     sleep 1
     attempts=$((attempts - 1))
   done
-  die "RustFS is not reachable from the host at $endpoint."
+  die "The S3 service is not reachable from the host at $endpoint."
 }
 
 create_bucket() {
@@ -75,7 +96,7 @@ create_bucket() {
     --env RUSTFS_ACCESS_KEY="$ACCESS_KEY" \
     --env RUSTFS_SECRET_KEY="$SECRET_KEY" \
     --env RUSTFS_BUCKET="$BUCKET" \
-    "$RUSTFS_CLI_IMAGE" \
+    "$S3_CLI_IMAGE" \
     -eu -c '
       rc alias set local "$RUSTFS_ENDPOINT" "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY" --bucket-lookup path --quiet
       rc bucket create --ignore-existing "local/$RUSTFS_BUCKET"
@@ -89,7 +110,7 @@ build_worker() {
 
 deploy_worker() {
   local endpoint="$1"
-  say "Deploying the Worker to RustFS"
+  say "Deploying the Worker to $STORAGE_BACKEND"
   docker run --rm \
     --network host \
     --env AWS_ACCESS_KEY_ID="$ACCESS_KEY" \
@@ -116,8 +137,8 @@ main() {
   apply_manifests
 
   local endpoint
-  endpoint="$(rustfs_endpoint)"
-  wait_for_rustfs_route "$endpoint"
+  endpoint="$(s3_endpoint)"
+  wait_for_s3_route "$endpoint"
   create_bucket "$endpoint"
   build_worker
   deploy_worker "$endpoint"

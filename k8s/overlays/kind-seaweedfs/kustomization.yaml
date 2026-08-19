@@ -1,8 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: durable-locks
+namespace: durable-locks-seaweedfs
 resources:
-  - ../../base
+  - ../../base/celld
+  - ../../base/seaweedfs
   - namespace.yaml
 secretGenerator:
   - name: s3-credentials
@@ -11,13 +12,14 @@ secretGenerator:
       - AWS_SECRET_ACCESS_KEY=durable-locks-secret
     options:
       labels:
-        app.kubernetes.io/name: rustfs
+        app.kubernetes.io/name: seaweedfs
         app.kubernetes.io/component: object-storage
         app.kubernetes.io/part-of: durable-locks
 patches:
+  - path: celld-endpoints.yaml
   - target:
       kind: Deployment
-      name: rustfs
+      name: seaweedfs
     patch: |-
       - op: add
         path: /spec/template/spec/nodeSelector
@@ -25,7 +27,7 @@ patches:
           kubernetes.io/hostname: kind-worker
   - target:
       kind: PersistentVolumeClaim
-      name: rustfs-data
+      name: seaweedfs-data
     patch: |-
       - op: add
         path: /spec/storageClassName

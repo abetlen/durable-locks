@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celld
+spec:
+  template:
+    spec:
+      containers:
+        - name: celld
+          env:
+            - name: S3_ENDPOINT
+              value: http://s3.durable-locks-seaweedfs.svc.cluster.local:9000
+            - name: CELLD_ADVERTISE
+              value: api-internal.durable-locks-seaweedfs.svc.cluster.local:8081

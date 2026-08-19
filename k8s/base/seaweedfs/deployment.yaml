@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rustfs
+  name: seaweedfs
   labels:
-    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/name: seaweedfs
     app.kubernetes.io/component: object-storage
     app.kubernetes.io/part-of: durable-locks
 spec:
@@ -12,11 +12,11 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app.kubernetes.io/name: rustfs
+      app.kubernetes.io/name: seaweedfs
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: rustfs
+        app.kubernetes.io/name: seaweedfs
         app.kubernetes.io/component: object-storage
         app.kubernetes.io/part-of: durable-locks
     spec:
@@ -24,14 +24,21 @@ spec:
       enableServiceLinks: false
       securityContext:
         runAsNonRoot: true
-        runAsUser: 10001
-        runAsGroup: 10001
-        fsGroup: 10001
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
       containers:
-        - name: rustfs
-          image: rustfs/rustfs:1.0.0-beta.12
+        - name: seaweedfs
+          image: chrislusf/seaweedfs:4.42
           imagePullPolicy: IfNotPresent
+          args:
+            - mini
+            - -dir=/data
+            - -master.telemetry=false
+            - -webdav=false
+            - -admin.user=durable-locks
+            - -admin.password=$(ADMIN_PASSWORD)
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -40,58 +47,56 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           env:
-            - name: RUSTFS_ACCESS_KEY
+            - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
                   name: s3-credentials
                   key: AWS_ACCESS_KEY_ID
-            - name: RUSTFS_SECRET_KEY
+            - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: s3-credentials
                   key: AWS_SECRET_ACCESS_KEY
-            - name: RUSTFS_ADDRESS
-              value: 0.0.0.0:9000
-            - name: RUSTFS_CONSOLE_ADDRESS
-              value: 0.0.0.0:9001
-            - name: RUSTFS_CONSOLE_ENABLE
-              value: "true"
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: S3_BUCKET
+              value: durable-locks
           ports:
             - name: s3
-              containerPort: 9000
+              containerPort: 8333
               protocol: TCP
             - name: console
-              containerPort: 9001
+              containerPort: 23646
               protocol: TCP
           startupProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: s3
-            failureThreshold: 30
+            failureThreshold: 45
             periodSeconds: 2
             timeoutSeconds: 2
           readinessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: s3
             failureThreshold: 3
             periodSeconds: 5
             timeoutSeconds: 2
           livenessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: s3
             failureThreshold: 3
             periodSeconds: 10
             timeoutSeconds: 3
           resources:
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 250m
+              memory: 512Mi
           volumeMounts:
             - name: data
               mountPath: /data
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: rustfs-data
+            claimName: seaweedfs-data

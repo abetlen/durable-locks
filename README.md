@@ -49,6 +49,25 @@ The local services are then available at:
 
 The RustFS console credentials are `durable-locks` and `durable-locks-secret`.
 
+### Kubernetes
+
+The Kind overlays support RustFS by default and SeaweedFS as an alternative S3 backend.
+
+Deploy with RustFS:
+
+```sh
+./k8s/deploy.sh
+```
+
+Deploy the independent SeaweedFS environment:
+
+```sh
+./k8s/deploy.sh seaweedfs
+```
+
+The RustFS environment uses the `durable-locks` namespace, while the SeaweedFS environment uses `durable-locks-seaweedfs` so both can run safely on the same cluster.
+Each command applies its Kustomize overlay, deploys the Worker to the selected object store, and restarts its celld node.
+
 ## Try the API
 
 Create a lock:

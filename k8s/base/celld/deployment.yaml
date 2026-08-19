@@ -44,13 +44,13 @@ spec:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: rustfs-credentials
-                  key: RUSTFS_ACCESS_KEY
+                  name: s3-credentials
+                  key: AWS_ACCESS_KEY_ID
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: rustfs-credentials
-                  key: RUSTFS_SECRET_KEY
+                  name: s3-credentials
+                  key: AWS_SECRET_ACCESS_KEY
             - name: AWS_REGION
               value: us-east-1
             - name: CELLD_BUCKET
