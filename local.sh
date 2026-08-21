@@ -4,7 +4,7 @@ set -Eeuo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-CELLD_IMAGE="${CELLD_IMAGE:-ghcr.io/denoland/celld:0.2.1}"
+CELLD_IMAGE="${CELLD_IMAGE:-ghcr.io/denoland/celld:0.3.0}"
 RUSTFS_IMAGE="${RUSTFS_IMAGE:-rustfs/rustfs:1.0.0-beta.12}"
 RUSTFS_CLI_IMAGE="${RUSTFS_CLI_IMAGE:-rustfs/rc:v0.1.31}"
 

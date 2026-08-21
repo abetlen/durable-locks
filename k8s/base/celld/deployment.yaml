@@ -31,7 +31,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       containers:
         - name: celld
-          image: ghcr.io/denoland/celld:0.2.1
+          image: ghcr.io/denoland/celld:0.3.0
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false

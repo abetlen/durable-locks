@@ -29,7 +29,7 @@ if (($# > 1)); then
   exit 1
 fi
 
-CELLD_IMAGE="${CELLD_IMAGE:-ghcr.io/denoland/celld:0.2.1}"
+CELLD_IMAGE="${CELLD_IMAGE:-ghcr.io/denoland/celld:0.3.0}"
 S3_CLI_IMAGE="${S3_CLI_IMAGE:-rustfs/rc:v0.1.31}"
 
 BUCKET="durable-locks"
